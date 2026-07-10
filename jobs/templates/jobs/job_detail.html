@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ job.title }}</title>
+  </head>
+  <body>
+    <p><a href="{% url 'jobs:job_list' %}">← Back to jobs</a></p>
+    <h1>{{ job.title }}</h1>
+    <p><strong>Company:</strong> {{ job.company.name }}</p>
+    {% if job.location %}<p><strong>Location:</strong> {{ job.location }}</p>{% endif %}
+    {% if job.url %}<p><a href="{{ job.url }}">View original posting</a></p>{% endif %}
+    {% if job.description %}<div>{{ job.description|linebreaks }}</div>{% endif %}
+  </body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jobs</title>
+  </head>
+  <body>
+    <h1>Jobs</h1>
+    <ul>
+      {% for job in jobs %}
+        <li><a href="{% url 'jobs:job_detail' job.pk %}">{{ job.title }}</a> — {{ job.company.name }}</li>
+      {% empty %}
+        <li>No jobs found.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
