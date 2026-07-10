@@ -1,8 +1,7 @@
 from django.utils import timezone
 
 from jobs.models import Company, ScrapeRun
-from jobs.services.fetch import FetchError, fetch_url
-from jobs.services.parsers import parse_jobs
+from scrapers import ScrapeTarget, scrape
 
 
 def run_scrape(*, company_id: int | None = None, source: str | None = None) -> int:
@@ -24,12 +23,20 @@ def run_scrape(*, company_id: int | None = None, source: str | None = None) -> i
         if company is None:
             raise NotImplementedError("Bulk scrape across all companies is not implemented yet.")
 
-        raw_content = fetch_url(company.careers_url or company.website)
-        parsed_jobs = parse_jobs(scrape_source, raw_content)
+        result = scrape(
+            ScrapeTarget(
+                source=scrape_source,
+                url=company.careers_url or company.website,
+            )
+        )
 
-        scrape_run.jobs_found = len(parsed_jobs)
-        scrape_run.status = ScrapeRun.Status.SUCCESS
-    except (FetchError, NotImplementedError) as exc:
+        if not result.ok:
+            scrape_run.status = ScrapeRun.Status.FAILED
+            scrape_run.error_message = result.error or "Unknown scrape error"
+        else:
+            scrape_run.jobs_found = len(result.jobs)
+            scrape_run.status = ScrapeRun.Status.SUCCESS
+    except NotImplementedError as exc:
         scrape_run.status = ScrapeRun.Status.FAILED
         scrape_run.error_message = str(exc)
     finally:
