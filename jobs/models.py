@@ -22,6 +22,17 @@ class Company(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+class SkillTag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 class Job(models.Model):
     class Status(models.TextChoices):
@@ -36,15 +47,29 @@ class Job(models.Model):
     external_id = models.CharField(max_length=255, blank=True)
     title = models.CharField(max_length=255)
     url = models.URLField(unique=True)
-    location = models.CharField(max_length=255, blank=True)
+    location = models.CharField(max_length=255, blank=True, default="Remote")
     description = models.TextField(blank=True)
-    posted_at = models.DateTimeField(null=True, blank=True)
-    scraped_at = models.DateTimeField(auto_now=True)
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
         default=Status.ACTIVE,
     )
+
+    # Financial fields using Decimal for precise currency representation
+    salary_min = models.DecimalField(max_length=12, decimal_places=2, max_digits=12, blank=True, null=True)
+    salary_max = models.DecimalField(max_length=12, decimal_places=2, max_digits=12, blank=True, null=True)
+
+
+    # Native Postgres JSONB field for raw unstructured scraper payloads
+    raw_scraper_meta = models.JSONField(default=dict, blank=True)
+    
+    # Relationships
+    tags = models.ManyToManyField(SkillTag, related_name='listings', blank=True)
+    
+    # Timestamps
+    scraped_at = models.DateTimeField(auto_now=True)
+    posted_at = models.DateTimeField(null=True, blank=True)
+
 
     class Meta:
         ordering = ["-posted_at", "-scraped_at"]
