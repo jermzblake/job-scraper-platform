@@ -1,4 +1,4 @@
-from .base import ScrapeResult, ScrapeTarget, scrape
+from .engine import ScrapeResult, ScrapeTarget, scrape
 from .fetch import FetchError, fetch_url
 from .parsers import ParsedJob, parse_jobs
 
