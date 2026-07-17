@@ -15,12 +15,16 @@ class Command(BaseCommand):
         parser.add_argument(
             "--source",
             type=str,
+            # default='https://hiringcafe.com/'
+            default='https://mock-jobs-board.com',
             help="Scraper/parser source identifier (e.g. greenhouse, lever).",
         )
 
     def handle(self, *args, **options):
         company_id = options.get("company")
         source = options.get("source")
+        
+        self.stdout.write(self.style.WARNING(f"Initializing scraping engine sequence for: {source}"))
 
         if company_id:
             scrape_run_id = scrape_company(company_id, source=source)
