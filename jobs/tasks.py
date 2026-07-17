@@ -10,7 +10,7 @@ Wire these to Celery when ready, e.g.:
         ...
 """
 
-from jobs.services.scrapers import run_scrape
+from jobs.services.scrape import run_scrape
 
 
 def scrape_company(company_id: int, source: str | None = None) -> int:
